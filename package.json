@@ -1,24 +1,25 @@
 {
-  "name": "jade-brunch",
-  "version": "2.8.0",
-  "description": "Adds Jade support to brunch.",
-  "author": "Paul Miller (http://paulmillr.com/)",
-  "homepage": "https://github.com/brunch/jade-brunch",
+  "name": "pug-brunch",
+  "version": "1.0.0",
+  "description": "Adds Pug support to brunch.",
+  "author": "Arun Mascarenhas (https://github.com/arunmascarenhas)",
+  "contributors": "Paul Miller (http://paulmillr.com/)",
+  "homepage": "https://github.com/arunmascarenhas/pug-brunch",
   "keywords": [
     "brunchplugin",
-    "jade",
+    "pug",
     "template"
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:brunch/jade-brunch.git"
+    "url": "git@github.com:arunmascarenhas/pug-brunch.git"
   },
   "scripts": {
-    "test": "node_modules/.bin/eslint index.js && node_modules/.bin/mocha"
+    "test": "eslint index.js && mocha"
   },
   "dependencies": {
-    "jade": "~1.11.0",
-    "progeny": "~0.5.2",
+    "pug": "2.0.0-beta6",
+    "progeny": "~0.10.0",
     "umd-wrapper": "~0.1.0"
   },
   "devDependencies": {

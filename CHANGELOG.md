@@ -1,3 +1,6 @@
+# pug-brunch 1.0.0 (November 28, 2016)
+* Updated dependencies to switch accomodate the name change from Jade to Pug.
+
 # jade-brunch 2.0.0 (Jan 29, 2016)
 * Updated source code & API. The plugin would now only work with Brunch 2.2 and higher.
 

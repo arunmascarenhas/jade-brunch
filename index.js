@@ -1,6 +1,6 @@
 'use strict';
 
-const jade = require('jade');
+const pug = require('pug');
 const sysPath = require('path');
 const umd = require('umd-wrapper');
 const progeny = require('progeny');
@@ -15,13 +15,13 @@ const clone = (obj) => {
   return copy;
 };
 
-class JadeCompiler {
+class PugCompiler {
   constructor(cfg) {
     if (cfg == null) cfg = {};
     const defaultBaseDir = sysPath.join(cfg.paths.root, 'app');
     const defaultStaticBaseDir = sysPath.join(defaultBaseDir, 'assets');
-    const jade = cfg.plugins && cfg.plugins.jade;
-    const config = (jade && jade.options) || jade;
+    const pug = cfg.plugins && cfg.plugins.pug;
+    const config = (pug && pug.options) || pug;
 
     // Allow runtime to be excluded
     if (config && config.noRuntime) {
@@ -29,7 +29,7 @@ class JadeCompiler {
     }
 
     // cloning is mandatory because config is not mutable
-    this.locals = jade && jade.locals || {};
+    this.locals = pug && pug.locals || {};
     this.options = clone(config) || {};
     this.options.compileDebug = false;
     this.options.client = true;
@@ -38,12 +38,16 @@ class JadeCompiler {
 
     const getDependencies = progeny({
       rootPath: this.options.basedir,
-      reverseArgs: true
+      reverseArgs: true,
+      extension: 'pug',
+      regexp: /^\s*(?:include|extends)\s+(.+)/
     });
 
     const getDependenciesStatic = progeny({
       rootPath: this.options.staticBasedir,
-      reverseArgs: true
+      reverseArgs: true,
+      extension: 'pug',
+      regexp: /^\s*(?:include|extends)\s+(.+)/
     });
 
     this.getDependencies = (data, path, cb) => {
@@ -66,12 +70,12 @@ class JadeCompiler {
       let result, error;
       try {
         let compiled;
-        // cloning is mandatory because Jade changes it
+        // cloning is mandatory because Pug changes it
         if (options.preCompile === true) {
-          const precompiled = jade.compile(data, options)();
+          const precompiled = pug.compile(data, options)();
           compiled = JSON.stringify(precompiled);
         } else {
-          compiled = jade.compileClient(data, options);
+          compiled = pug.compileClient(data, options);
         }
         result = umd(compiled);
       } catch (_error) {
@@ -93,7 +97,7 @@ class JadeCompiler {
       options.filename = path;
       options.basedir = options.staticBasedir;
       locals.filename = path.replace(new RegExp('^' + options.basedir + '/'), '');
-      const fn = jade.compile(data, options);
+      const fn = pug.compile(data, options);
       const compiled = fn(locals);
       return Promise.resolve(compiled);
     } catch (error) {
@@ -102,19 +106,19 @@ class JadeCompiler {
   }
 }
 
-let jadePath = require.resolve('jade');
+let pugPath = require.resolve('pug');
 
-while (sysPath.basename(jadePath) !== 'jade') {
-  jadePath = sysPath.dirname(jadePath);
+while (sysPath.basename(pugPath) !== 'pug') {
+  pugPath = sysPath.dirname(pugPath);
 }
 
-JadeCompiler.prototype.include = [
-  sysPath.join(jadePath, 'runtime.js')
+PugCompiler.prototype.include = [
+  sysPath.join(pugPath, 'lib', 'index.js')
 ];
 
-JadeCompiler.prototype.brunchPlugin = true;
-JadeCompiler.prototype.type = 'template';
-JadeCompiler.prototype.extension = 'jade';
-JadeCompiler.prototype.staticTargetExtension = 'html';
+PugCompiler.prototype.brunchPlugin = true;
+PugCompiler.prototype.type = 'template';
+PugCompiler.prototype.extension = 'pug';
+PugCompiler.prototype.staticTargetExtension = 'html';
 
-module.exports = JadeCompiler;
+module.exports = PugCompiler;

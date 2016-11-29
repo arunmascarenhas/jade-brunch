@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var Plugin = require('./');
-var jade = require('jade');
+var pug = require('pug');
 var sysPath = require('path');
 var fs = require('fs');
 
@@ -23,19 +23,19 @@ describe('Plugin', function() {
     var content = 'doctype html';
     var expected = '<!DOCTYPE html>';
 
-    plugin.compile({data: content, path: 'template.jade'}).then(data => {
+    plugin.compile({data: content, path: 'template.pug'}).then(data => {
       expect(eval(data)()).to.equal(expected);
       done();
     }, error => expect(error).not.to.be.ok);
   });
 
-  describe('runtime', function() {
+  describe('index', function() {
 
-    it('should include jade/runtime.js', function(){
-      expect(plugin.include).to.match(/jade\/runtime\.js$/);
+    it('should include pug/lib/index.js', function(){
+      expect(plugin.include).to.match(/pug\/lib\/index\.js$/);
     });
 
-    it('jade/runtime.js should exist', function(){
+    it('pug/lib/index.js should exist', function(){
       expect(fs.existsSync(plugin.include[0])).to.be.ok;
     });
 
@@ -46,22 +46,22 @@ describe('Plugin', function() {
     it('should output valid deps', function(done) {
       var content = "\
 include valid1\n\
-include valid1.jade\n\
+include valid1.pug\n\
 include ../../test/valid1\n\
-include ../../test/valid1.jade\n\
+include ../../test/valid1.pug\n\
 include /valid3\n\
 extends valid2\n\
-extends valid2.jade\n\
+extends valid2.pug\n\
 include ../../test/valid2\n\
-include ../../test/valid2.jade\n\
+include ../../test/valid2.pug\n\
 extends /valid4\n\
 ";
 
       var expected = [
-        sysPath.join('valid1.jade'),
-        sysPath.join('app', 'valid3.jade'),
-        sysPath.join('valid2.jade'),
-        sysPath.join('app', 'valid4.jade'),
+        sysPath.join('valid1.pug'),
+        sysPath.join('app', 'valid3.pug'),
+        sysPath.join('valid2.pug'),
+        sysPath.join('app', 'valid4.pug'),
       ];
 
       // progeny now only outputs actually found files by default
@@ -70,7 +70,7 @@ extends /valid4\n\
         fs.writeFileSync(file, 'div');
       });
 
-      plugin.getDependencies(content, 'template.jade', function(error, dependencies) {
+      plugin.getDependencies(content, 'template.pug', function(error, dependencies) {
         expect(error).not.to.be.ok;
         expect(dependencies).to.have.members(expected);
 
@@ -94,8 +94,8 @@ extends /valid4\n\
 ";
 
       var expected = [
-        sysPath.join('custom', 'valid3.jade'),
-        sysPath.join('custom', 'valid4.jade'),
+        sysPath.join('custom', 'valid3.pug'),
+        sysPath.join('custom', 'valid4.pug'),
       ];
 
       // progeny now only outputs actually found files by default
@@ -104,9 +104,9 @@ extends /valid4\n\
         fs.writeFileSync(file, 'div');
       });
 
-      plugin = new Plugin({paths: {root: '.'}, plugins: {jade: {basedir: 'custom'}}});
+      plugin = new Plugin({paths: {root: '.'}, plugins: {pug: {basedir: 'custom'}}});
 
-      plugin.getDependencies(content, 'template.jade', function(error, dependencies) {
+      plugin.getDependencies(content, 'template.pug', function(error, dependencies) {
         expect(error).not.to.be.ok;
         expect(dependencies).to.have.members(expected);
 
